@@ -35,12 +35,8 @@ public class Ex1Test {
         }
         @Test
         void int2NumberTest() {
-           // implement this test
-        }
+
         @Test
         void maxIndexTest() {
-            // implement this test
-        }
 
-        // Add additional test functions - test as much as you can.
     }

@@ -19,44 +19,37 @@ public class Ex1 {
      * @return
      **/
     public static int number2Int(String num) {
-        int ans = -1;
+        int ans = -1; //Initialize the answer to -1, representing an invalid number.
         //Check if Input is null or empty.
         if (num == null || num.isEmpty()) {
-            return ans;
+            return ans; //If input is null or empty, return -1
         }
-        //find the index 'b', which separates the number and the base
+        //find the index 'b', which separates the number from the base
         int bIndex = num.indexOf("b");
-        if (bIndex == -1 || bIndex == 0 || bIndex == num.length() - 1) {
-            return ans;
+        if (bIndex == -1) {
+            return ans; //If 'b' is not found, return -1.
         }
         //Split the string into the numPart, and the base part
         String numPart = num.substring(0, bIndex);
         String basePart = num.substring(bIndex + 1);
-
+        //Parse the base as an integer, base should be in range [2,16]
         int base;
         try {
-            //Parse the base
-            base = Integer.parseInt(basePart, 16);
+            base = Integer.parseInt(basePart, 16);//Try to parse the base as a hexadecimal base
         } catch (NumberFormatException e) {
-            return ans;
+            return ans; //If parsing the base fails, return -1
         }
         //Validate the base is within the range [2,16]
         if (base < 2 || base > 16) {
-            return ans;
+            return ans;//If the base outside the runge, return -1
         }
-        //Check that all characters in the number part are valid for the base
-        for (char c : numPart.toCharArray()) {
-            if (Character.digit(c, base) == -1) {
-                return ans;
-            }
-        }
-        try {
-            //Convert the number part to a decimal integer using the base
+        try { //Try to parse the numPart in the given base
             ans = Integer.parseInt(numPart, base);
         } catch (NumberFormatException e) {
-            return ans;
+            return ans; //If parsing the number fails, return -1
         }
-        return ans;
+        //return the final result (the number in decimal)
+        return ans; //If everything is valid, return the converted number
     }
 
     /**
@@ -69,35 +62,36 @@ public class Ex1 {
         boolean ans = true;
         //Check if input is null or empty
         if (a == null || a.isEmpty()) {
-            return false;
+            return false; //If the input is null or empty, it's not a valid number
         }
-        //Find the index 'b', which separates the number and the base
+        //Find the index 'b', which separates the number from the base
         int bIndex = a.indexOf("b");
-        if (bIndex == -1 || bIndex == 0 || bIndex == a.length() - 1) {
+        if (bIndex == -1 || a.indexOf('b', bIndex +1) !=- 1) {
             return false;
         }
-        //Split the sting Into the number part and the base part.
+        //Split the sting Into the number part (before 'b') and the base part (after 'b').
         String numberPart = a.substring(0, bIndex);
         String basePart = a.substring(bIndex + 1);
-
+        //Check if the base part is a valid integer and within the valid range
         int base;
         try {
             //Parse the base
-            base = Integer.parseInt(basePart);
+            base = Integer.parseInt(basePart, 16); //Try to parse the base as a hexadecimal base
         } catch (NumberFormatException e) {
-            return false; //Invalid base format
+            return false; //If the base can't be parsed, it's not a valid base
         }
         //validate the base is within the range [2,16]
         if (base < 2 || base > 16) {
-            return false;
+            return false; //If the base is outside the range,return false
         }
-        //Check that all characters in the numberPart are valid for the base.
-        for (char c : numberPart.toCharArray()) {
-            if (Character.digit(c, base) == -1) {
-                return false;
-            }
+        //Check if the numPart is valid in the specified base
+        try {
+            Integer.parseInt(numberPart, base); //Try to parse the number in the given base
+            } catch (NumberFormatException e) {
+            return false; //If the number can't be pars, return false
         }
-        return ans; //The input is valid "number" format
+        //If all checks pass, return true
+         return ans; //The input is valid "number" format
     }
 
     /**
@@ -113,14 +107,29 @@ public class Ex1 {
         String ans = ""; //Initialize the answer variable as an empty string
         //Check if the input is invalid: num must be non-negative,base within the range [2,16]
         if (num < 0 || base < 2 || base > 16) {
-            return ans;
+            return ans; //If invalid input, return an empty string
         }
-        //Convert the number to a string in the given base
-        String numPart = Integer.toString(num, base).toUpperCase();
-        //Construct the final string in the format <numPart>b<base>
-        ans = numPart + "b" + Integer.toString(base, 16).toUpperCase();
-
-        return ans; //Return to final formatted string
+        //Edge case - if num=0, return "0" as a result
+       if (num==0){
+           return "0b"+base;
+       }
+       //use the stringBuilder to build the number in the specified base
+       StringBuilder result;
+        result = new StringBuilder();
+        //convert the number to the specified base
+        while (num > 0) {
+            int reminder = num % base; //Get the reminder when divided by the base
+            if (reminder < 10){
+                result.insert(0,(char) ('0'+reminder)); //For reminders 0-9, add the digit as a character
+            } else {
+                result.insert(0,(char) ('A'+reminder-10)); //For reminders 10-16, use the letters A-G
+            }
+            num = num/base; //Reduce the number by dividing it by the base
+        }
+        //Add the base information to the result string
+        ans = result.toString() +'b'+ base; // Append 'b' and the base to the number representation
+        // Return the final result
+        return ans; //Return the number in the specified base, including the base information
     }
 
     /**
@@ -132,13 +141,21 @@ public class Ex1 {
      */
     public static boolean equals(String n1, String n2) {
         boolean ans = true;
-        //Check if one of the strings is null
-        if (n1 == null || n2 == null || !isNumber(n1) || !isNumber(n2)) {
-            ans = false;
+        //Check if one of the input numbers is null or empty
+        if (n1 == null || n2 == null || n1.isEmpty() || n2.isEmpty()) {
+            ans = false; // If one of them null or empty, they are not equal
         } else {
-            int decimal1 = number2Int(n1);
-            int decimal2 = number2Int(n2);
-            ans = (decimal1 == decimal2);
+            int num1 = number2Int(n1); //Convert n1 to int
+            int num2 = number2Int(n2); //Convert n2 to int
+            //If either of the numbers is invalid, they are not equal
+            if (num1 == -1 || num2 == -1) {
+                ans = false;
+            } else {
+                //compare the two numbers
+                if (num1 != num2) {
+                    ans = false; //If the numbers are not equal, set 'ans' to false
+                }
+            }
         }
         return ans; //If the two numbers have the same value
     }
@@ -153,25 +170,25 @@ public class Ex1 {
      */
     public static int maxIndex(String[] arr) {
         int ans = 0;
-        //If the array is null or empty, return -1
+        //Check if the array is valid and non-empty
         if (arr == null || arr.length == 0) {
-            return -1;
+            return -1; //If the array is null or empty, return -1
         }
+        //Check if the first element is a valid number
         int maxValue = number2Int(arr[0]);
         if (maxValue == -1) {
-            return -1;//If the first element is invalid, return -1
+            return -1; //Return -1 if the first number is invalid
         }
-        //Iterate through the rest of the array to find the index of the maxValue
+        //Iterate through the rest of the array to find the largest value
         for (int i = 1; i < arr.length; i++) {
-            if (arr[i] != null) {
-                int currentValue = number2Int(arr[i]);
-                if (currentValue != -1 && currentValue > maxValue) {
-                    maxValue = currentValue;
-                    ans = i; //Update the index if a higher valid value is found
+            int currentNum = number2Int(arr[i]);
+            //If the current number is valid and larger than the previous one
+                if (currentNum != -1 && currentNum > maxValue) {
+                    ans = i; //Update 'ans' to a new index with the larger number
+                    maxValue = currentNum;
                 }
             }
-        }
-        return ans; //return the index of the maxValue found
+        return ans; //return the index with the largest value
     }
 }
 
