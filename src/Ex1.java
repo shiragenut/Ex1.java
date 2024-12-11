@@ -134,12 +134,11 @@ public class Ex1 {
         boolean ans = true;
         //Check if one of the strings is null
         if (n1 == null || n2 == null || !isNumber(n1) || !isNumber(n2)) {
-            return false;
+            ans = false;
         } else {
-            //Compare the content of the string if neither is null
-            if (!n1.equals(n2)) {
-                return false;
-            }
+            int decimal1 = number2Int(n1);
+            int decimal2 = number2Int(n2);
+            ans = (decimal1 == decimal2);
         }
         return ans; //If the two numbers have the same value
     }
